@@ -1,0 +1,29 @@
+{
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  // "prettier.configPath": "./.prettierrc.js",
+  // "prettier.prettierPath": "./node_modules/prettier/index.cjs",
+  // "editor.formatOnSave": true,
+  // "editor.formatOnType": true,
+  "eslint.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "stylelint.validate": [
+    // "css",
+    "less",
+    "sass",
+    "scss"
+    // "stylus",
+    // "postcss"
+  ],
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma",
+    "editor.formatOnSave": true
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ]
+}

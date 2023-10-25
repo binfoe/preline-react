@@ -1,0 +1,65 @@
+{
+  "name": "preline-react",
+  "version": "0.0.1",
+  "description": "React implementation of Preline UI (preline.io)",
+  "main": "lib/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit && eslint './{src,scripts}/**/*.{js,ts,tsx}' --fix",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,tsx,ts}": "eslint --fix"
+  },
+  "keywords": [
+    "preline",
+    "tailwindcss",
+    "react"
+  ],
+  "author": "Yuhang Ge <abeyuhang@gmail.com>",
+  "peerDependencies": {
+    "cva": "npm:class-variance-authority@*",
+    "lodash-es": "*",
+    "react": "*",
+    "react-dom": "*",
+    "react-icons": "*"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.26.1",
+    "@tanstack/react-table": "^8.10.7",
+    "preline": "^1.9.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.10",
+    "@types/node": "^20.8.8",
+    "@types/react": "^18.2.31",
+    "@types/react-dom": "^18.2.14",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "cva": "npm:class-variance-authority@^0.7.0",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.0.2",
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.6",
+    "react-icons": "^4.11.0",
+    "typescript": "^5.2.2"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binfoe/preline-react.git"
+  },
+  "bugs": {
+    "url": "https://github.com/binfoe/preline-react/issues"
+  },
+  "homepage": "https://github.com/binfoe/preline-react#readme"
+}

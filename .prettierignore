@@ -1,0 +1,7 @@
+node_modules
+/dist
+.gitignore
+pnpm-lock.yaml
+README.md
+/public
+/.next
