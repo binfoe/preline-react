@@ -1,6 +1,6 @@
 {
   "name": "preline-react",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "React implementation of Preline UI (preline.io)",
   "main": "lib/index.js",
   "types": "src/index.ts",
