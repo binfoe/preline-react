@@ -10,7 +10,8 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "declaration": true,
+    "jsx": "react-jsx",
     "outDir": "./lib"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],

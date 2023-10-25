@@ -1,4 +1,4 @@
-import { CSSProperties, FC, ReactNode, useEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from 'cva';
 import {
   BsChevronDoubleLeft,
@@ -11,7 +11,7 @@ import { isNumber, isUndefined } from 'lodash-es';
 import { isFunction } from '@tanstack/react-table';
 import { Spin } from '../spin';
 import { NumberInput } from '../input';
-import { Select, SelectOption } from '../select';
+import { Select } from '../select';
 import { calcFullPaginationInfo } from './helper';
 
 export interface ShowTotalArg {
@@ -104,33 +104,17 @@ export const Pagination: FC<PaginationProps> = ({
     }
   };
 
-  const renderSizeOptions = () => {
-    const opts = Array.isArray(pageSizeOptions) ? pageSizeOptions : [10, 20, 30, 50, 70, 100];
-    return (
-      <Select
-        value={currentSize}
-        className='w-28'
-        valueRender={(v) => `${v}条/页`}
-        onChange={(v) => {
-          setIpt(1);
-          if (ctrl.current) {
-            onChange?.(0, v);
-          } else {
-            setCurrentPage(1);
-            setCurrentSize(v);
-          }
-        }}
-      >
-        {opts.map((n) => {
-          return (
-            <SelectOption key={n} value={n}>
-              {n}条/页
-            </SelectOption>
-          );
-        })}
-      </Select>
+  const opts = useMemo(() => {
+    if (!pageSizeOptions) return [];
+    return (Array.isArray(pageSizeOptions) ? pageSizeOptions : [10, 20, 30, 50, 70, 100]).map(
+      (s) => {
+        return {
+          label: `${s}条/页`,
+          value: s,
+        };
+      },
     );
-  };
+  }, [pageSizeOptions]);
 
   if (hideSinglePage && !total) {
     return null;
@@ -229,7 +213,23 @@ export const Pagination: FC<PaginationProps> = ({
       >
         <BsChevronRight />
       </button>
-      {pageSizeOptions && renderSizeOptions()}
+      {pageSizeOptions && (
+        <Select
+          value={currentSize}
+          options={opts}
+          className='w-28'
+          valueRender={(v) => `${v}条/页`}
+          onChange={(v) => {
+            setIpt(1);
+            if (ctrl.current) {
+              onChange?.(0, v);
+            } else {
+              setCurrentPage(1);
+              setCurrentSize(v);
+            }
+          }}
+        />
+      )}
       {useJumper && (
         <label className='ml-1 flex items-center'>
           跳至
