@@ -30,7 +30,7 @@ export interface NavMenuProps {
   openKeys?: string[];
   selectedKeys?: string[];
   onOpenChange?: (openKeys: string[]) => void;
-  onSelect?: (args: { item: MenuItemProps; selectedKeys: string[] }) => void;
+  onSelect?: (selectedKeys: string[]) => void;
   items: (MenuItemProps | '-')[];
 }
 
@@ -54,16 +54,16 @@ const MenuLabel: FC<{
         className,
         itemClassName,
         item.className,
-        open || selected ? 'text-blue-600' : 'text-slate-700  dark:text-white',
+        selected ? 'text-blue-600' : 'text-slate-700  dark:text-white',
       )}
       style={{ ...itemStyle, ...item.style }}
       onClick={() => {
         onClick?.({ item });
       }}
     >
-      {item.icon && <span className='mr-3.5 h-3.5 w-3.5 flex-shrink-0'>{item.icon}</span>}
-      <span className='flex-1 truncate'>{item.name}</span>
-      {item.shortKey && <span>{item.shortKey}</span>}
+      {item.icon && <div className='mr-3.5 h-3.5 w-3.5 flex-shrink-0'>{item.icon}</div>}
+      <div className='flex-1 truncate [&>a]:block [&>a]:w-full'>{item.name}</div>
+      {item.shortKey && <div>{item.shortKey}</div>}
       {open === undefined ? null : (
         <BsChevronDown
           className={cx(
@@ -83,9 +83,22 @@ const MenuItem: FC<{
   itemStyle?: CSSProperties;
   className?: string;
   openKeys: string[];
+  selectKeys: string[];
   onClick?: NavMenuProps['onClick'];
+  onSelect: (item: MenuItemProps) => void;
   onOpenChange: (item: MenuItemProps, isOpen: boolean) => void;
-}> = ({ item, level, className, itemClassName, itemStyle, openKeys, onClick, onOpenChange }) => {
+}> = ({
+  item,
+  level,
+  className,
+  itemClassName,
+  itemStyle,
+  openKeys,
+  selectKeys,
+  onSelect,
+  onClick,
+  onOpenChange,
+}) => {
   const [height, isOpen] = useMemo(() => {
     // console.log(openKeys, item.key);
     if (!item.children?.length || !openKeys.includes(item.key)) return [0, false];
@@ -126,6 +139,8 @@ const MenuItem: FC<{
                 itemStyle={itemStyle}
                 level={level + 1}
                 openKeys={openKeys}
+                selectKeys={selectKeys}
+                onSelect={onSelect}
                 onOpenChange={onOpenChange}
               />
             ),
@@ -137,11 +152,13 @@ const MenuItem: FC<{
     return (
       <MenuLabel
         className={className}
+        selected={selectKeys.indexOf(item.key) >= 0}
         item={item}
         itemClassName={itemClassName}
         itemStyle={itemStyle}
         onClick={() => {
           onClick?.({ item });
+          onSelect(item);
         }}
       />
     );
@@ -156,20 +173,20 @@ export const NavMenu: FC<NavMenuProps> = ({
   itemStyle,
   onClick,
   onOpenChange,
-  // onSelect,
+  onSelect,
   openKeys,
-  // selectedKeys,
+  selectedKeys,
 }) => {
   const openCtrl = useRef(!isUndefined(openKeys));
   const [opens, setOpens] = useState(openKeys || []);
   useEffect(() => {
     setOpens(openKeys || []);
   }, [openKeys]);
-  // const selectCtrl = useRef(!isUndefined(selectedKeys));
-  // const [selects, setSelects] = useState(selectedKeys || []);
-  // useEffect(() => {
-  //   setSelects(selectedKeys || []);
-  // }, [selectedKeys]);
+  const selectCtrl = useRef(!isUndefined(selectedKeys));
+  const [selects, setSelects] = useState(selectedKeys || []);
+  useEffect(() => {
+    setSelects(selectedKeys || []);
+  }, [selectedKeys]);
 
   // console.log('RRR', openKeys, opens);
   return (
@@ -186,6 +203,18 @@ export const NavMenu: FC<NavMenuProps> = ({
             className={cx(i > 0 && items.length > 1 && 'mt-1.5')}
             level={0}
             openKeys={opens}
+            selectKeys={selects}
+            onSelect={(item) => {
+              const newKeys = selects.slice();
+              if (newKeys.indexOf(item.key) < 0) {
+                newKeys.push(item.key);
+                if (!selectCtrl.current) {
+                  setSelects(newKeys);
+                } else {
+                  onSelect?.(newKeys);
+                }
+              }
+            }}
             onClick={onClick}
             onOpenChange={(item, isOpen) => {
               const newKeys = opens.slice();

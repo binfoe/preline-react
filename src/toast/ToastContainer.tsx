@@ -1,8 +1,9 @@
 import { CSSProperties, FC, ReactNode, forwardRef, useEffect, useState } from 'react';
 import { BsXLg } from 'react-icons/bs';
 import { cx } from 'cva';
+import { createRoot } from 'react-dom/client';
 import { TransitionGroup, Transition } from '../transition';
-import { useLatestZIndex } from '../util';
+import { watchLatestZIndex } from '../util';
 
 export interface ToastOptions {
   icon?: ReactNode;
@@ -19,6 +20,7 @@ type Toast = ToastOptions & { id: string };
 
 export interface ToastInstance {
   close: () => void;
+  update: (content: ReactNode) => void;
 }
 
 export const toastConfig = {
@@ -30,6 +32,7 @@ export const emitter = {
   push: new Set<(toast: Toast) => void>(),
   clear: new Set<() => void>(),
   close: new Set<(id: string) => void>(),
+  update: new Set<(id: string, content: ReactNode) => void>(),
 };
 
 // eslint-disable-next-line react/display-name
@@ -60,7 +63,7 @@ const ToastItem = forwardRef<HTMLDivElement, { toast: Toast; onClose: (id: strin
             </div>
           ) : null}
           <div className='ml-3 flex-1'>
-            <p className='text-sm text-gray-700 dark:text-gray-400'>{toast.content}</p>
+            <div className='text-sm text-gray-700 dark:text-gray-400'>{toast.content}</div>
           </div>
           {toast.closable ? (
             <button
@@ -76,12 +79,22 @@ const ToastItem = forwardRef<HTMLDivElement, { toast: Toast; onClose: (id: strin
     );
   },
 );
-export const ToastContainer: FC = () => {
+
+const ToastContainer: FC = () => {
   const [queue, setQueue] = useState<Toast[]>([]);
   const close = (id: string) => {
     setQueue((q) => {
       const idx = q.findIndex((t) => t.id === id);
       if (idx >= 0) q.splice(idx, 1);
+      return q.slice();
+    });
+  };
+  const update = (id: string, content: ReactNode) => {
+    setQueue((q) => {
+      const t = q.find((t) => t.id === id);
+      if (t) {
+        t.content = content;
+      }
       return q.slice();
     });
   };
@@ -101,34 +114,43 @@ export const ToastContainer: FC = () => {
     emitter.push.add(onPush);
     emitter.clear.add(onClear);
     emitter.close.add(close);
+    emitter.update.add(update);
     return () => {
       emitter.push.delete(onPush);
       emitter.clear.delete(onClear);
       emitter.close.delete(close);
+      emitter.update.delete(update);
     };
   }, []);
 
-  const [z] = useLatestZIndex(2);
   return (
-    <div
-      style={{ zIndex: z }}
-      className={`pointer-events-none fixed left-1/2 top-0 -translate-x-1/2`}
-    >
-      <TransitionGroup>
-        {queue.map((toast) => (
-          <Transition
-            key={toast.id}
-            enterFrom='-translate-y-[80%] opacity-0'
-            enterActive='transition-[opacity,transform] duration-[300ms,300ms] ease-in'
-            enterTo='opacity-1 translate-y-0'
-            leaveFrom='opacity-1 translate-y-0'
-            leaveActive='transition-[opacity,transform] duration-[300ms,100ms] ease-out'
-            leaveTo='-translate-y-[80%] opacity-0'
-          >
-            <ToastItem toast={toast} onClose={close} />
-          </Transition>
-        ))}
-      </TransitionGroup>
-    </div>
+    <TransitionGroup>
+      {queue.map((toast) => (
+        <Transition
+          key={toast.id}
+          enterFrom='-translate-y-[80%] opacity-0'
+          enterActive='transition-[opacity,transform] duration-[300ms,300ms] ease-in'
+          enterTo='opacity-1 translate-y-0'
+          leaveFrom='opacity-1 translate-y-0'
+          leaveActive='transition-[opacity,transform] duration-[300ms,100ms] ease-out'
+          leaveTo='-translate-y-[80%] opacity-0'
+        >
+          <ToastItem toast={toast} onClose={close} />
+        </Transition>
+      ))}
+    </TransitionGroup>
   );
 };
+
+function initToastContainer() {
+  const $dv = document.createElement('div');
+  watchLatestZIndex((z) => {
+    $dv.style.zIndex = z.toString();
+  });
+  $dv.className = `pointer-events-none fixed left-1/2 top-0 -translate-x-1/2`;
+  document.body.appendChild($dv);
+  createRoot($dv).render(<ToastContainer />);
+}
+if (typeof window !== 'undefined') {
+  initToastContainer();
+}

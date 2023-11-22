@@ -80,3 +80,12 @@ export function useLatestZIndex(offset = 1) {
   }, []);
   return [z];
 }
+
+export function watchLatestZIndex(handler: (z: number) => void, offset = 1) {
+  const listener = () => handler(currentCoverZIndex + offset);
+  watchers.add(listener);
+  return () => {
+    watchers.delete(listener);
+  };
+  listener();
+}

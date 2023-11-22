@@ -54,9 +54,9 @@ const MenuLabel = forwardRef<
         onClick?.({ item });
       }}
     >
-      {item.icon && <span className='mr-3.5 h-3.5 w-3.5 flex-shrink-0'>{item.icon}</span>}
-      <span className='flex-1 truncate'>{item.name}</span>
-      {item.shortKey && <span>{item.shortKey}</span>}
+      {item.icon && <div className='mr-3.5 h-3.5 w-3.5 flex-shrink-0'>{item.icon}</div>}
+      <div className='flex-1 truncate [&>a]:block [&>a]:w-full'>{item.name}</div>
+      {item.shortKey && <div>{item.shortKey}</div>}
       {hasSub && <BsChevronRight className={cx('flex-shrink-0 text-gray-600')} />}
     </div>
   );
